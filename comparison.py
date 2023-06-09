@@ -40,7 +40,8 @@ def bs_gpt_method(url, input_prompt, model):
 
 def bard_method(url, input_prompt):
     full_prompt = f"{url}\n{input_prompt}"
-    reply = Bard(timeout=15).get_answer(full_prompt)['content']
+    timeout = Bard(timeout=30)
+    reply = timeout.get_answer(full_prompt)['content']
     return reply
 
 def clarity_method(url, input_prompt,model):
