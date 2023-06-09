@@ -2,4 +2,3 @@ bs4
 openai
 bardapi
 requests
-os
