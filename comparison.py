@@ -3,12 +3,10 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import openai
-from bardapi import Bard
 import os
 
 # Set your OpenAI API key
 openai.api_key = st.secrets['OPENAI_API_KEY']
-os.environ['_BARD_API_KEY']=st.secrets['BARD_API_KEY']
 
 def bs_gpt_method(url, input_prompt, model):
     # Download the webpage content
@@ -36,12 +34,6 @@ def bs_gpt_method(url, input_prompt, model):
 
     # Extract the assistant's reply
     reply = response['choices'][0]['message']['content']
-    return reply
-
-def bard_method(url, input_prompt):
-    full_prompt = f"{url}\n{input_prompt}"
-    timeout = Bard(timeout=30)
-    reply = timeout.get_answer(full_prompt)['content']
     return reply
 
 def clarity_method(url, input_prompt,model):
@@ -72,6 +64,21 @@ def clarity_method(url, input_prompt,model):
     reply = response['choices'][0]['message']['content']
     return reply
 
+def webpilot_method(url, input_prompt):
+    import json
+    url = 'https://preview.webpilotai.com/api/v1/watt'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 5f4f1401dd3f4a559a5f1ff98f6f80c2',  # replace <WebPilot_Issued_Token> with your actual token
+    }
+    data = {
+        "Content": f"{input_prompt} {url}"
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    return(response.json()['content'])
+
 # Create a text area for input and a button
 st.title('Comparison Platform')
 website = st.text_area("Input website URL", placeholder="https://example.com")
@@ -82,7 +89,7 @@ if generate_button:
     with st.spinner("Running Prompts..."):    
         gpt3 = bs_gpt_method(website, input_prompt, 'gpt-3.5-turbo')
         gpt4 = bs_gpt_method(website, input_prompt, 'gpt-4-0314')
-        bard = bard_method(website, input_prompt)
+        webpilot = webpilot_method(website, input_prompt)
         clarity = clarity_method(website, input_prompt, 'gpt-4-0314')
         
     # Display the reply    
@@ -95,7 +102,7 @@ if generate_button:
         st.text_area("GPT 4 Method Result", gpt4, height = 400)
     bard_col, clarity_col = st.columns(2)
     with bard_col:
-        st.text_area("Bard Method Result", bard, height = 400)
+        st.text_area("WebPilot API Result", webpilot, height = 400)
     with clarity_col:
         st.text_area("Clarity Method Result", clarity, height = 400)
         
