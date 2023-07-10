@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 import openai
 import os
+import json
+
 
 # Set your OpenAI API key
 openai.api_key = st.secrets['OPENAI_API_KEY']
@@ -64,15 +66,14 @@ def clarity_method(url, input_prompt,model):
     reply = response['choices'][0]['message']['content']
     return reply
 
-def webpilot_method(url, input_prompt):
-    import json
+def webpilot_method(website, input_prompt):
     url = 'https://preview.webpilotai.com/api/v1/watt'
     headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer 5f4f1401dd3f4a559a5f1ff98f6f80c2',  # replace <WebPilot_Issued_Token> with your actual token
     }
     data = {
-        "Content": f"{input_prompt} {url}"
+        "Content": f"{input_prompt} {website}"
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
